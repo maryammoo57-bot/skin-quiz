@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پرسشنامه تشخیص نوع پوست</title>
+<style>
+body { font-family: Tahoma, sans-serif; direction: rtl; padding: 20px; background: linear-gradient(180deg,#eefaf5 0%, #ffffff 100%); }
+.container { max-width: 700px; margin: 30px auto; background: #fff; padding: 28px; border-radius: 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+header { text-align: center; margin-bottom: 10px; }
+h2 { color: #1b7a59; margin: 6px 0; font-size: 1.8rem; }
+.intro { color: #333; line-height: 1.7; }
+.form-row label { display:block; margin:12px 0; }
+input[type="text"], input[type="number"], select { width:100%; padding:12px; border-radius:10px; border:1px solid #d7eae2; }
+button { background:#1b7a59; color:#fff; border:none; padding:12px 18px; border-radius:10px; cursor:pointer; font-size:1rem; box-shadow: 0 6px 18px rgba(27,122,89,0.12); transition: transform .12s ease, box-shadow .12s ease; }
+button:hover { background:#166645; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(22,102,69,0.15); }
+.question { margin-top:18px; background:linear-gradient(180deg,#fbfffd,#f2fbf7); padding:18px; border-radius:12px; box-shadow: 0 6px 18px rgba(27,122,89,0.06); }
+.question h3 { margin:0 0 8px 0; font-size:1.05rem; color:#13573f; font-family: Georgia, 'Times New Roman', serif; }
+label.option { display:block; margin:8px 0; cursor:pointer; }
+.result { margin-top:24px; padding:20px; background:#f1f9f5; border-radius:12px; }
+.skin-card { background:#ffffff; padding:14px; border-radius:12px; margin:12px 0; box-shadow: 0 6px 12px rgba(0,0,0,0.04); opacity:0; transform: translateY(8px); }
+.skin-card h4 { margin:0 0 8px 0; font-size:1.05rem; color:#0e5b3f; font-family: 'Georgia', serif; }
+.skin-card p { margin:6px 0; color:#333; line-height:1.6; }
+.skin-card p.warning { background:#fff7f6; border-left:4px solid #ff6b6b; padding:10px; border-radius:6px; }
+.skin-card p.products { background:#f7fff8; border-left:4px solid #23a058; padding:10px; border-radius:6px; }
+.type-badge { display:inline-block; padding:10px 14px; border-radius:20px; background:linear-gradient(90deg,#f7fff8,#eaf6f1); border:2px solid #d9efe3; font-weight:700; color:#0b643f; margin-top:8px; font-size:1.05rem; }
+.cta-area { margin-top:18px; display:flex; flex-direction:column; gap:12px; }
+.cta-grid { display:grid; grid-template-columns: 1fr; gap:12px; }
+.cta-card { background: linear-gradient(180deg,#ffffff,#f7fff8); padding:14px; border-radius:12px; box-shadow: 0 8px 20px rgba(13,94,61,0.06); display:flex; align-items:center; gap:12px; border:1px solid #e6f3ec; opacity:0; transform: translateY(8px); }
+.cta-card .icon { width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:#eaf6f1; flex-shrink:0; }
+.cta-card h5 { margin:0; font-size:1rem; color:#0e5b3f; }
+.cta-card p { margin:4px 0 0 0; color:#444; font-size:0.95rem; line-height:1.4; }
+.cta-actions { display:flex; gap:10px; margin-top:10px; }
+.cta-actions a { text-decoration:none; }
+.cta-actions a button { padding:10px 14px; border-radius:10px; font-weight:700; }
+.btn-cta-purple { background:#0088cc; color:#fff; }
+.btn-cta-green  { background:#0088cc; color:#fff; }
+.btn-cta-lightblue { background:#5dade2; color:#fff; }
+@media(min-width:700px){ .cta-grid { grid-template-columns: repeat(3, 1fr); } }
+.small-note { margin-top:12px; color:#555; font-size:0.95rem; text-align:center; }
+@keyframes slideUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+.animate { animation: slideUp .45s cubic-bezier(.2,.9,.2,1) both; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h2>🌿 پرسشنامه رایگان تشخیص نوع پوست</h2>
+    <p class="intro">این پرسشنامه به صورت کاملاً رایگان توسط <strong>دکتر مریم موسویان</strong>، پزشک زیبایی ارائه می‌شود. تنها چند دقیقه وقت لازم است تا نوع پوست شما و نیازهای آن را مشخص کنیم.</p>
+  </header>
+
+  <section id="form-section">
+    <h3>اطلاعات اولیه</h3>
+    <div class="form-row">
+      <label>نام: <input type="text" id="firstName"></label>
+      <label>نام خانوادگی: <input type="text" id="lastName"></label>
+      <label>شماره موبایل: <input type="text" id="phone"></label>
+      <label>جنسیت:
+        <select id="gender"><option value="مرد">مرد</option><option value="زن">زن</option></select>
+      </label>
+      <label>سن: <input type="number" id="age" min="1" max="120"></label>
+      <button onclick="startQuiz()">شروع پرسشنامه</button>
+    </div>
+  </section>
+
+  <section id="quiz-section" style="display:none;"></section>
+  <section id="result-section" style="display:none;"></section>
+</div>
+
+<script>
+const quizQuestions = [
+  { q: 'بعد از شست‌وشوی صورت، پوستت بعد از ۳۰ دقیقه چه حسی داره؟', a: ['کشیده و خشک', 'براق و چرب', 'پیشانی و بینی چرب، گونه‌ها خشک یا نرمال', 'متعادل', 'قرمز یا سوزش دارد'] },
+  { q: 'معمولاً در طول روز، پوستت چطور به نظر می‌رسه؟', a: ['مات و بی‌روح', 'براق و چرب', 'در ناحیه پیشانی و بینی کمی براق و بقیه جاها خشک یا نرمال', 'شفاف و یکنواخت', 'زود قرمز می‌شود'] },
+  { q: 'وقتی یک کرم مرطوب‌کننده سبک استفاده می‌کنی، چه احساسی داری؟', a: ['باز هم احساس خشکی دارم', 'خیلی چرب می‌شود', 'بعضی قسمت‌ها خوب ولی بعضی قسمتها سنگین', 'مناسب و راحت', 'احساس سوزش یا خارش دارم'] },
+  { q: 'آیا منافذ پوستت قابل مشاهده‌اند؟', a: ['بسیار کوچک', 'بزرگ و واضح', 'در بعضی قسمتها بزرگ', 'طبیعی و یکنواخت', 'همراه قرمزی'] },
+  { q: 'پوستت در زمستان چگونه است؟', a: ['خشک و پوسته‌پوسته', 'چرب باقی می‌ماند', 'بخش‌هایی خشک، بخش‌هایی چرب', 'تغییری ندارد', 'حساس و قرمز'] },
+  { q: 'چه میزان جوش یا آکنه داری؟', a: ['بسیار کم، بیشتر احساس خشکی', 'زیاد، مخصوصا در نواحی چرب', 'گاهی در نواحی پیشانی و چانه', 'خیلی کم یا هیچ', 'پوستم مدام به محصولات واکنش می دهد'] }
+];
+
+let userAnswers = [];
+let currentQuestion = 0;
+
+const contribByQuestion = [
+  [ {oil:-1.6, sens:0.1}, {oil:1.6, sens:0.1}, {oil:0.8, sens:0.15}, {oil:0.0, sens:0.05}, {oil:0.0, sens:0.9} ],
+  [ {oil:-1.2, sens:0.1}, {oil:1.4, sens:0.15}, {oil:0.9, sens:0.12}, {oil:0.0, sens:0.05}, {oil:0.0, sens:0.8} ],
+  [ {oil:-1.3, sens:0.2}, {oil:1.0, sens:0.1}, {oil:0.6, sens:0.3}, {oil:0.0, sens:0.05}, {oil:0.0, sens:1.3} ],
+  [ {oil:-0.8, sens:0.05}, {oil:1.5, sens:0.08}, {oil:1.1, sens:0.06}, {oil:0.0, sens:0.03}, {oil:0.0, sens:0.1} ],
+  [ {oil:-1.4, sens:0.25}, {oil:1.0, sens:0.1}, {oil:1.0, sens:0.18}, {oil:0.0, sens:0.05}, {oil:0.0, sens:1.1} ],
+  [ {oil:-0.9, sens:0.05}, {oil:1.5, sens:0.1}, {oil:1.2, sens:0.12}, {oil:0.0, sens:0.03}, {oil:0.0, sens:0.15} ]
+];
+
+function startQuiz(){
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const age = document.getElementById('age').value;
+  if(!firstName||!lastName||!phone||!age){ alert('لطفا همه اطلاعات را وارد کنید'); return; }
+  document.getElementById('form-section').style.display='none';
+  showQuestion();
+}
+
+function showQuestion(){
+  if(currentQuestion>=quizQuestions.length){ showResult(); return; }
+  const q = quizQuestions[currentQuestion];
+  let html = `<div class="question"><h3>سوال ${currentQuestion+1}: ${q.q}</h3>`;
+  q.a.forEach((ans,i)=>{ html += `<label class='option'><input type='radio' name='q${currentQuestion}' value='${ans}'> ${ans}</label>`; });
+  html += `<div style="margin-top:10px;"><button onclick='nextQuestion()'>بعدی</button></div></div>`;
+  document.getElementById('quiz-section').innerHTML = html;
+  document.getElementById('quiz-section').style.display='block';
+}
+
+function nextQuestion(){
+  const radios = document.getElementsByName('q'+currentQuestion);
+  let selected = null;
+  radios.forEach(r=>{ if(r.checked) selected = r.value; });
+  if(!selected){ alert('لطفا یک گزینه انتخاب کنید'); return; }
+  userAnswers.push(selected);
+  currentQuestion++;
+  showQuestion();
+}
+
+function showResult(){
+  document.getElementById('quiz-section').style.display='none';
+  if(userAnswers.length === 0){ alert('اطلاعاتی برای محاسبه وجود ندارد.'); return; }
+
+  const allFirst = userAnswers.every((ans, idx) => quizQuestions[idx].a[0] === ans);
+  const allLast  = userAnswers.every((ans, idx) => quizQuestions[idx].a[quizQuestions[idx].a.length - 1] === ans);
+
+  let oilScore = 0;
+  let sensScore = 0;
+  userAnswers.forEach((ans, qi) => {
+    const idx = quizQuestions[qi].a.indexOf(ans);
+    const contrib = (contribByQuestion[qi] && contribByQuestion[qi][idx]) ? contribByQuestion[qi][idx] : {oil:0,sens:0};
+    oilScore += contrib.oil;
+    sensScore += contrib.sens;
+  });
+
+  const oilyPositive = oilScore > 0 ? oilScore : 0;
+  const dryPositive  = oilScore < 0 ? Math.abs(oilScore) : 0;
+  const sensitivePositive = sensScore > 0 ? sensScore : 0;
+
+  let mixScore = 0;
+  userAnswers.forEach((ans, qi) => {
+    const idx = quizQuestions[qi].a.indexOf(ans);
+    if(idx === 2){
+      const contrib = contribByQuestion[qi][2];
+      mixScore += Math.abs(contrib.oil) * 0.9 + contrib.sens * 0.4;
+    }
+  });
+
+  const normalBase = Math.max(0, 1.0 - (oilyPositive + dryPositive + sensitivePositive + mixScore) * 0.12);
+
+  let scores = { خشک: dryPositive, چرب: oilyPositive, مختلط: mixScore, نرمال: normalBase, حساس: sensitivePositive };
+
+  let typeKey = 'نرمال';
+  if(allFirst){
+    typeKey = 'خشک';
+    scores = {خشک:1, چرب:0, مختلط:0, نرمال:0, حساس:0};
+  } else if(allLast){
+    typeKey = 'حساس';
+    scores = {خشک:0, چرب:0, مختلط:0, نرمال:0, حساس:1};
+  } else {
+    const maxScore = Math.max(scores.خشک, scores.چرب, scores.مختلط, scores.نرمال, scores.حساس);
+    if(scores.حساس >= Math.max(0.9, maxScore)){
+      typeKey = 'حساس';
+    } else {
+      const winners = Object.entries(scores).filter(([k,v]) => Math.abs(v - maxScore) < 1e-6).map(([k]) => k);
+      if(winners.length === 1){ typeKey = winners[0]; }
+      else {
+        const priority = ['حساس','مختلط','چرب','خشک','نرمال'];
+        for(const p of priority){ if(winners.includes(p)){ typeKey = p; break; } }
+      }
+    }
+  }
+
+  const texts = {
+    'چرب':{ title: '۱️⃣ پوست چرب', desc: 'توضیح: پوست چرب معمولاً منافذ باز، براق و مستعد جوش و آکنه است.', warn: 'هشدار: شستشوی بیش از حد می‌تواند باعث تحریک و التهاب شود؛ از محصولات خیلی چرب و سنگین پرهیز کنید.', products: 'محصولات پیشنهادی: شوینده سبک، تونر بدون الکل، مرطوب‌کننده بدون چربی، ضد آفتاب سبک.' },
+    'خشک':{ title: '۲️⃣ پوست خشک', desc: 'توضیح: پوست خشک ممکن است کشیده، حساس و پوسته‌پوسته باشد.', warn: 'هشدار: استفاده از شوینده‌های قوی یا محصولات حاوی الکل می‌تواند خشکی را بدتر کند.', products: 'محصولات پیشنهادی: کرم مرطوب‌کننده غنی، روغن‌های طبیعی، ماسک‌های آبرسان، ضد آفتاب مرطوب‌کننده.' },
+    'مختلط':{ title: '۳️⃣ پوست مختلط', desc: 'توضیح: پوست مختلط ترکیبی از چربی در ناحیه T و خشکی در گونه‌هاست.', warn: 'هشدار: استفاده از محصولات یکسان در کل صورت ممکن است باعث چربی بیش از حد یا خشکی شود.', products: 'محصولات پیشنهادی: محصولات متعادل‌کننده، کرم‌های سبک برای نواحی چرب و مرطوب‌کننده قوی برای نواحی خشک، ضد آفتاب سبک.' },
+    'نرمال':{ title: '۴️⃣ پوست نرمال', desc: 'توضیح: پوست نرمال متعادل، سالم و کم مشکل است.', warn: 'هشدار: حفظ رطوبت و استفاده از ضد آفتاب مهم است.', products: 'محصولات پیشنهادی: مرطوب‌کننده روزانه سبک، شوینده ملایم، ضد آفتاب استاندارد.' },
+    'حساس':{ title: '۵️⃣ پوست حساس', desc: 'توضیح: پوست حساس مستعد قرمزی، سوزش و واکنش به محصولات مختلف است.', warn: 'هشدار: از محصولات با عطر، الکل یا ترکیبات تحریک‌کننده پرهیز کنید.', products: 'محصولات پیشنهادی: شوینده ملایم، کرم‌های ضد التهاب و ترمیم‌کننده، ضد آفتاب فیزیکی، محصولات مخصوص پوست حساس.' }
+  };
+
+  const content = texts[typeKey] || texts['نرمال'];
+
+  const message = encodeURIComponent(`سلام! من پرسشنامه پوست رو انجام دادم.
+نام: ${document.getElementById('firstName').value} ${document.getElementById('lastName').value}
+شماره: ${document.getElementById('phone').value}
+سن: ${document.getElementById('age').value}
+جنسیت: ${document.getElementById('gender').value}
+نوع پوست: ${typeKey}
+جواب‌ها: ${userAnswers.join(' | ')}`);
+
+  let html = `<div class='result'>`;
+  html += `<p class="small-note">ممنون از پاسخ شما 😊💛</p>`;
+  html += `<h3>نوع پوست شما:</h3><div class='type-badge'>${typeKey==='حساس' ? 'پوست حساس' : content.title.replace(/^[0-9️⃣ ]+/, '')}</div>`;
+  html += `<div class='skin-card'><h4>${content.title}</h4><p>${content.desc}</p></div>`;
+  html += `<div class='skin-card'><h4>هشدار</h4><p class='warning'>${content.warn}</p></div>`;
+  html += `<div class='skin-card'><h4>محصولات پیشنهادی</h4><p class='products'>${content.products}</p></div>`;
+
+  // دکمه ارسال به بله
+  html += `<div class='actions' style="margin-top:14px;"><a href='https://ble.ir/dr_m_mosavian?text=${message}' target='_blank'><button>ارسال پاسخ‌ها به دکتر موسویان در بله</button></a></div>`;
+
+  html += `<div class="cta-area">`;
+  html += `<div class="cta-grid">`;
+
+  // کارت کانال بله
+  html += `<div class="cta-card"><div class="icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#0b643f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div><div><h5>محتوای آموزشی پوست و مو</h5><p>برای دریافت آخرین مطالب آموزشی و معرفی محصولات، کانال بله ما رو دنبال کنید</p><div class="cta-actions"><a href="https://ble.ir/drmimskin" target="_blank"><button class="btn-cta-purple">کانال بله</button></a></div></div></div>`;
+
+  // کارت ویزیت بله
+  html += `<div class="cta-card"><div class="icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-5.1-1.8L3 21l1.9-4.5A8.38 8.38 0 015 11.5 8.5 8.5 0 1112 20a8.38 8.38 0 009-8.5z" stroke="#0b643f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div><div><h5>ویزیت آنلاین اختصاصی</h5><p>برای دریافت روتین شخصی‌سازی‌شده و تشخیص دقیق پوستت، ویزیت آنلاین رزرو کن</p><div class="cta-actions"><a href="https://ble.ir/dr_m_mosavian" target="_blank"><button class="btn-cta-green">رزرو ویزیت</button></a></div></div></div>`;
+
+  // کارت سایت
+  html += `<div class="cta-card"><div class="icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 12h18" stroke="#0b643f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3 6h18" stroke="#0b643f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3 18h18" stroke="#0b643f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div><div><h5>فروشگاه محصولات</h5><p>محصولات مناسب نوع پوستت رو از فروشگاه ما سفارش بده و خیلی زود به دستت برسه</p><div class="cta-actions"><a href="https://www.drmimskin.com" target="_blank"><button class="btn-cta-lightblue">فروشگاه</button></a></div></div></div>`;
+
+  html += `</div></div></div>`;
+
+  document.getElementById('result-section').innerHTML = html;
+  document.getElementById('result-section').style.display='block';
+
+  setTimeout(()=>{
+    document.querySelectorAll('.skin-card').forEach((el,i)=>{ setTimeout(()=> el.classList.add('animate'), i*120); });
+    document.querySelectorAll('.cta-card').forEach((el,i)=>{ setTimeout(()=> el.classList.add('animate'), 600 + i*120); });
+  },50);
+}
+</script>
+</body>
+</html>
